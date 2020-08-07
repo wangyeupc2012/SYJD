@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="application.common.crmsjlog.mapper.CrmSjLogMapper">
+    <insert id="logInsert" parameterType="application.common.crmsjlog.vo.CrmSjLogVo">
+        insert into sj_log(id,created_date,user_id,login_ip,log_type,log_content)
+        values
+        (GET_PRIMARY_ID('sj_log'),sysdate,#{user_id},#{login_ip},1,#{log_content})
+    </insert>
+
+    <select id="getCrmSjLogList" parameterType="application.common.crmsjlog.vo.CrmSjLogVo" resultType="application.common.crmsjlog.vo.CrmSjLogVo">
+        select to_char(s.created_date,'yyyy-MM-dd hh24:mi:ss') created_date,
+        s.user_id,
+        f.LOGIN_USERNAME user_name,
+        s.login_ip,
+        s.log_content
+        from sj_log s,FND_USERS f
+        where s.user_id = f.USER_ID
+        <if test="user_name != null and user_name != ''">
+            and f.LOGIN_USERNAME = #{user_name}
+        </if>
+        order by s.created_date desc
+    </select>
+
+    <select id="getCrmSjLogCount" parameterType="application.common.crmsjlog.vo.CrmSjLogVo" resultType="int">
+        select count(1)
+        from sj_log s,FND_USERS F
+        where s.user_id = f.USER_ID
+        <if test="user_name != null and user_name != ''">
+            and f.LOGIN_USERNAME = #{user_name}
+        </if>
+    </select>
+</mapper>
